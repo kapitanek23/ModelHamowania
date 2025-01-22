@@ -13,13 +13,12 @@ def index():
 def data():
     """
     Endpoint zwracający dane symulacji w formacie JSON.
-    Oczekujemy parametrów w [m/s] i sekundach (SI).
-    GET parametry:
-      v0    -> prędkość początkowa [m/s]
-      dt    -> krok czasowy [s]
-      c     -> współczynnik oporu
-      m     -> masa pojazdu [kg]
-      t_max -> maksymalny czas symulacji [s]
+    GET parametry (w SI):
+      v0    -> [m/s]
+      dt    -> [s]
+      c
+      m     -> [kg]
+      t_max -> [s]
     """
 
     v0 = float(request.args.get('v0', 30.0))
@@ -37,9 +36,9 @@ def data():
     )
 
     return jsonify({
-        "time": t_points,
-        "velocity": v_points,
-        "position": x_points
+        "time": t_points,       # [s]
+        "velocity": v_points,   # [m/s]
+        "position": x_points    # [m]
     })
 
 if __name__ == '__main__':

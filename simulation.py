@@ -2,19 +2,19 @@
 
 def simulate_braking(v0=30.0, dt=0.1, c=0.1, m=1000.0, t_max=60.0):
     """
-    Symulacja spowolnienia pojazdu przy założeniu oporu proporcjonalnego do v^2.
-    v0    - początkowa prędkość [m/s]
-    dt    - krok czasowy [s]
-    c     - współczynnik oporu
-    m     - masa pojazdu [kg]
-    t_max - maksymalny czas symulacji [s]
+    Symulacja spowolnienia pojazdu przy założeniu oporu ~ c * v^2.
+    Parametry:
+      v0    - początkowa prędkość [m/s]
+      dt    - krok czasowy [s]
+      c     - współczynnik oporu
+      m     - masa pojazdu [kg]
+      t_max - maksymalny czas symulacji [s]
 
-    Zwraca krotkę (time_points, velocity_points, position_points):
-      - time_points: lista chwil czasu      (w sekundach)
-      - velocity_points: lista prędkości    (w m/s)
-      - position_points: lista położeń      (w metrach)
+    Zwraca:
+      time_points     (lista) sekundy
+      velocity_points (lista) prędkość [m/s]
+      position_points (lista) położenie [m]
     """
-
     time_points = []
     velocity_points = []
     position_points = []
@@ -28,14 +28,10 @@ def simulate_braking(v0=30.0, dt=0.1, c=0.1, m=1000.0, t_max=60.0):
         velocity_points.append(v)
         position_points.append(x)
 
-        # Siła oporu (proporcjonalna do v^2)
         F_drag = c * v**2
-        # Przyspieszenie (ujemne) wynikające z tej siły
-        a = F_drag / m
+        a = F_drag / m   # przyspieszenie (ujemne)
 
-        # Aktualizacja prędkości
         v_new = v - a * dt
-        # Aktualizacja położenia
         x_new = x + v * dt
 
         v = max(v_new, 0)
