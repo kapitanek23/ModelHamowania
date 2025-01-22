@@ -8,53 +8,175 @@
 </head>
 <body>
     <h1>Symulacja spowolnienia pojazdu</h1>
+
+    <form id="paramForm">
+        <!-- Wartość v0 (liczba) -->
+        <label for="v0">Początkowa prędkość v0:</label>
+        <input type="number" id="v0" value="30" step="0.1">
+        <br><br>
+
+        <!-- Jednostka prędkości wejściowa -->
+        <label>Jednostka prędkości (wejściowa):</label>
+        <input type="radio" name="velocityUnitInput" value="ms" checked> m/s
+        <input type="radio" name="velocityUnitInput" value="kmh"> km/h
+        <br><br>
+
+        <!-- Krok czasowy, współczynnik oporu, masa, czas -->
+        <label>
+            Krok czasowy dt (s):
+            <input type="number" id="dt" value="0.1" step="0.01">
+        </label>
+        <br><br>
+
+        <label>
+            Współczynnik oporu c:
+            <input type="number" id="c" value="0.1" step="0.01">
+        </label>
+        <br><br>
+
+        <label>
+            Masa pojazdu m (kg):
+            <input type="number" id="mass" value="1000" step="10">
+        </label>
+        <br><br>
+
+        <label>
+            Maksymalny czas t_max (s):
+            <input type="number" id="t_max" value="60" step="1">
+        </label>
+        <br><br>
+
+        <!-- Jednostka prędkości wyjściowa (co chcemy widzieć na wykresie) -->
+        <label>Jednostka prędkości na wykresie:</label>
+        <input type="radio" name="velocityUnitOutput" value="ms" checked> m/s
+        <input type="radio" name="velocityUnitOutput" value="kmh"> km/h
+        <br><br>
+
+        <button type="button" id="simulateBtn">Symuluj</button>
+        <button type="button" id="clearBtn">Wyczyść</button>
+    </form>
+
+    <hr>
+
     <div id="myPlot" style="width:800px;height:500px;"></div>
 
     <script>
-    // Po załadowaniu strony pobieramy dane z /data
-    fetch('/data')
-        .then(response => response.json())
-        .then(data => {
-            const time = data.time;
-            const velocity = data.velocity;
+    // Zmienna globalna do przetrzymywania timer-a animacji,
+    // żeby móc go czyścić przy ponownym kliknięciu lub przycisku "Wyczyść".
+    let simulationTimer = null;
 
-            // Przygotowanie danych wstępnych do wykresu
-            var trace = {
-                x: [time[0]], 
-                y: [velocity[0]],
-                mode: 'lines',
-                line: {color: 'blue'},
-                name: 'Prędkość'
-            };
+    document.getElementById('simulateBtn').addEventListener('click', function() {
+        // Jeżeli mieliśmy uruchomiony interwał z poprzedniej symulacji, wyłączamy go:
+        if (simulationTimer) {
+            clearInterval(simulationTimer);
+            simulationTimer = null;
+        }
 
-            var layout = {
-                title: 'Prędkość pojazdu w czasie',
-                xaxis: { title: 'Czas [s]' },
-                yaxis: { title: 'Prędkość [m/s]' }
-            };
+        // Czyścimy poprzedni wykres (jeżeli istnieje)
+        Plotly.purge('myPlot');
 
-            // Inicjalizacja wykresu
-            Plotly.newPlot('myPlot', [trace], layout);
+        // Zbieramy dane z formularza
+        const v0Input = parseFloat(document.getElementById('v0').value);
+        const dt = parseFloat(document.getElementById('dt').value);
+        const c = parseFloat(document.getElementById('c').value);
+        const m = parseFloat(document.getElementById('mass').value);
+        const t_max = parseFloat(document.getElementById('t_max').value);
 
-            // Funkcja do animacji
-            let currentIndex = 0;
-            const interval = 100; // interwał w ms między aktualizacjami (np. 100 ms)
+        // Jednostka wejściowa v0
+        const velocityUnitInput = document.querySelector('input[name="velocityUnitInput"]:checked').value;
+        // Konwersja do m/s
+        let v0_ms = v0Input;
+        if (velocityUnitInput === 'kmh') {
+            v0_ms = v0Input / 3.6;
+        }
 
-            const timer = setInterval(() => {
-                currentIndex++;
-                if (currentIndex >= time.length) {
-                    clearInterval(timer);
-                } else {
-                    // Uaktualniamy dane
-                    Plotly.extendTraces('myPlot', {
-                        x: [[time[currentIndex]]],
-                        y: [[velocity[currentIndex]]]
-                    }, [0]);
+        // Jednostka wyjściowa
+        const velocityUnitOutput = document.querySelector('input[name="velocityUnitOutput"]:checked').value;
+
+        // Składamy URL do naszego endpointu
+        const url = `/data?v0=${v0_ms}&dt=${dt}&c=${c}&m=${m}&t_max=${t_max}`;
+
+        // Pobieramy dane z serwera
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const time = data.time;         // [s]
+                let velocity = data.velocity;   // [m/s]
+
+                // Ewentualna konwersja do km/h, jeśli użytkownik wybrał
+                if (velocityUnitOutput === 'kmh') {
+                    velocity = velocity.map(v => v * 3.6);
                 }
-            }, interval);
 
-        })
-        .catch(error => console.error(error));
+                // Przygotowujemy pierwszy punkt do animacji
+                const trace = {
+                    x: [time[0]],
+                    y: [velocity[0]],
+                    mode: 'lines',
+                    line: { color: 'blue' },
+                    name: (velocityUnitOutput === 'kmh')
+                          ? 'Prędkość (km/h)' : 'Prędkość (m/s)'
+                };
+
+                const layout = {
+                    title: 'Prędkość pojazdu w czasie',
+                    xaxis: { title: 'Czas [s]' },
+                    yaxis: {
+                        title: (velocityUnitOutput === 'kmh')
+                               ? 'Prędkość [km/h]' : 'Prędkość [m/s]'
+                    }
+                };
+
+                // Inicjalizacja wykresu
+                Plotly.newPlot('myPlot', [trace], layout);
+
+                // Animacja – dodawanie kolejnych punktów
+                let currentIndex = 0;
+                const intervalMs = 50; // co 50 ms dodajemy kolejny punkt
+
+                simulationTimer = setInterval(() => {
+                    currentIndex++;
+                    if (currentIndex >= time.length) {
+                        clearInterval(simulationTimer);
+                        simulationTimer = null;
+                    } else {
+                        Plotly.extendTraces('myPlot', {
+                            x: [[time[currentIndex]]],
+                            y: [[velocity[currentIndex]]]
+                        }, [0]);
+                    }
+                }, intervalMs);
+            })
+            .catch(error => console.error(error));
+    });
+
+    // Obsługa przycisku „Wyczyść”
+    document.getElementById('clearBtn').addEventListener('click', function() {
+        // Czyścimy ewentualny interwał
+        if (simulationTimer) {
+            clearInterval(simulationTimer);
+            simulationTimer = null;
+        }
+
+        // Czyścimy wykres
+        Plotly.purge('myPlot');
+
+        // Reset formularza do wartości domyślnych
+        // (można użyć document.getElementById("paramForm").reset(), ale wtedy
+        // radio buttony ustawią się na to, co jest w HTML jako "checked".
+        // Jeśli chcemy coś innego - ustawiamy ręcznie.)
+
+        document.getElementById('v0').value = '30';
+        document.getElementById('dt').value = '0.1';
+        document.getElementById('c').value = '0.1';
+        document.getElementById('mass').value = '1000';
+        document.getElementById('t_max').value = '60';
+
+        // Radio input (wejściowa jednostka v0)
+        document.querySelector('input[name="velocityUnitInput"][value="ms"]').checked = true;
+        // Radio output (jednostka wykresu)
+        document.querySelector('input[name="velocityUnitOutput"][value="ms"]').checked = true;
+    });
     </script>
 </body>
 </html>
