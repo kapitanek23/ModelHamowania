@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <title>Symulacja hamowania</title>
+    <!-- Załączamy Plotly z CDN -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Symulacja spowolnienia pojazdu</h1>
+    <div id="myPlot" style="width:800px;height:500px;"></div>
+
+    <script>
+    // Po załadowaniu strony pobieramy dane z /data
+    fetch('/data')
+        .then(response => response.json())
+        .then(data => {
+            const time = data.time;
+            const velocity = data.velocity;
+
+            // Przygotowanie danych wstępnych do wykresu
+            var trace = {
+                x: [time[0]], 
+                y: [velocity[0]],
+                mode: 'lines',
+                line: {color: 'blue'},
+                name: 'Prędkość'
+            };
+
+            var layout = {
+                title: 'Prędkość pojazdu w czasie',
+                xaxis: { title: 'Czas [s]' },
+                yaxis: { title: 'Prędkość [m/s]' }
+            };
+
+            // Inicjalizacja wykresu
+            Plotly.newPlot('myPlot', [trace], layout);
+
+            // Funkcja do animacji
+            let currentIndex = 0;
+            const interval = 100; // interwał w ms między aktualizacjami (np. 100 ms)
+
+            const timer = setInterval(() => {
+                currentIndex++;
+                if (currentIndex >= time.length) {
+                    clearInterval(timer);
+                } else {
+                    // Uaktualniamy dane
+                    Plotly.extendTraces('myPlot', {
+                        x: [[time[currentIndex]]],
+                        y: [[velocity[currentIndex]]]
+                    }, [0]);
+                }
+            }, interval);
+
+        })
+        .catch(error => console.error(error));
+    </script>
+</body>
+</html>
