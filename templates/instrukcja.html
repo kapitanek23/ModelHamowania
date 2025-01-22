@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Instrukcja</title>
+    <style>
+    /* Styl kontenera na wykres */
+    #plotContainer {
+      position: relative;
+      width: 800px;
+      height: 500px;
+    }
+    /* Panel z bieżącą prędkością i siłą */
+    #infoDisplay {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background-color: rgba(255,255,255,0.8);
+      padding: 5px 10px;
+      border: 1px solid #999;
+      border-radius: 5px;
+      font-weight: bold;
+      z-index: 9999;
+    }
+    /* Tabela wyników */
+    #resultsTable table {
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    #resultsTable th, #resultsTable td {
+      border: 1px solid #ccc;
+      padding: 5px 10px;
+      text-align: center;
+    }
+    #resultsTable th {
+      background-color: #eee;
+    }
+    .navbar {
+    background-color: #eee;
+    padding: 10px;
+    margin-bottom: 20px;
+    }
+    .navbar a {
+    margin-right: 10px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="/">Strona główna</a>
+        <a href="/instrukcja">Instrukcja</a>
+    </div>
+
+    <h1>Symulacja spowolnienia pojazdu</h1>
+    <h1>Instrukcja obsługi strony i opis modelu</h1>
+
+    <h2>1. Opis tematu</h2>
+    <p>
+        W naszym projekcie modelujemy proces spowalniania (hamowania) pojazdu
+        przy założeniu, że siła oporu jest proporcjonalna do kwadratu prędkości: 
+        <em>F<sub>drag</sub> = c &middot; v<sup>2</sup></em>.
+        Zakładamy, że opór jest jedyną siłą hamującą.
+    </p>
+
+    <h2>2. Wykorzystywane wzory</h2>
+    <ul>
+        <li>
+            Równanie ruchu zakłada przyspieszenie (ujemne) 
+            <em>a = F<sub>drag</sub> / m</em>.
+            <br>
+            Więc <em>v<sub>n+1</sub> = v<sub>n</sub> - a &middot; &Delta;t</em>.
+        </li>
+        <li>
+            Położenie obliczamy z 
+            <em>x<sub>n+1</sub> = x<sub>n</sub> + v<sub>n</sub> &middot; &Delta;t</em>.
+        </li>
+        <li>
+            Siła oporu: <em>F<sub>drag</sub> = c &middot; v<sup>2</sup></em>.
+        </li>
+    </ul>
+
+    <h2>3. Opis parametrów</h2>
+    <ul>
+        <li><strong>v0</strong> – prędkość początkowa (może być podana w m/s lub km/h).</li>
+        <li><strong>dt</strong> – krok czasowy symulacji [s].</li>
+        <li><strong>c</strong> – współczynnik oporu (im większy, tym szybciej spada prędkość).</li>
+        <li><strong>m</strong> – masa pojazdu [kg].</li>
+        <li><strong>t_max</strong> – maksymalny czas symulacji [s], używany w trybie „Zatrzymaj po czasie”.</li>
+        <li><strong>Tryb zakończenia symulacji</strong>:
+            <ul>
+                <li><em>time</em> – symulacja kończy się, gdy osiągniemy t_max sekund.</li>
+                <li><em>velocity</em> – symulacja kończy się, gdy prędkość spadnie do zera.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>4. Instrukcja obsługi strony</h2>
+    <ol>
+        <li>
+            Przejdź na stronę główną (<a href="/">Kliknij tutaj</a> lub wpisz <code>/</code> w adresie).
+        </li>
+        <li>
+            Wypełnij formularz parametrami: 
+            <ul>
+                <li>Wpisz prędkość początkową i wybierz, czy to m/s czy km/h.</li>
+                <li>Podaj krok czasowy <em>dt</em>.</li>
+                <li>Ustaw współczynnik oporu <em>c</em> i masę <em>m</em>.</li>
+                <li>Określ maksymalny czas symulacji <em>t_max</em>.</li>
+                <li>Zaznacz, czy chcesz zakończyć symulację po czasie <em>t_max</em> („time”) 
+                    czy przy prędkości zero („velocity”).</li>
+                <li>Wybierz docelową jednostkę prędkości do wyświetlania (m/s lub km/h).</li>
+            </ul>
+        </li>
+        <li>Kliknij „Symuluj” – na wykresie pojawi się animacja prędkości w czasie.</li>
+        <li>
+            Po zakończeniu symulacji wyświetli się tabela z wartościami kolejnych kroków:
+            iteracja, czas, prędkość, zmiana prędkości, siła oraz zmiana siły.
+        </li>
+        <li>
+            Jeśli chcesz zresetować parametry i wykres, kliknij „Wyczyść”.
+        </li>
+    </ol>
+
+    <hr>
+</body>
+</html>
