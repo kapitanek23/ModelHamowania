@@ -1,0 +1,182 @@
+/* Ogólny reset */
+body,
+h1,
+h2,
+p,
+ul,
+ol,
+li {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f5f8fc;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* Nawigacja */
+.navbar {
+    background-color: #3498db;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.navbar a {
+    margin-right: 15px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.navbar a:hover {
+    color: #eaf3fc;
+}
+
+/* Nagłówki */
+h1 {
+    text-align: center;
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+/* Kontener główny */
+#mainContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Wiersz z panelem i wykresem */
+#contentRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    /* Kluczowa zmiana: */
+    align-items: stretch;
+    gap: 20px;
+}
+
+/* Panel wprowadzania danych */
+#paramForm {
+    flex: 1;
+    max-width: 300px;
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-height: 400px;
+}
+
+#paramForm label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    color: #34495e;
+}
+
+/* Pola do wprowadzania danych w formularzu */
+#paramForm input[type="number"],
+#paramForm input[type="radio"] {
+    margin-right: 10px;
+}
+
+#paramForm input[type="number"] {
+    padding: 8px;
+    font-size: 0.9rem;
+    border: 1px solid #dcdde1;
+    border-radius: 15px;
+    /* Większe zaokrąglenie */
+    margin-bottom: 10px;
+    width: 80%;
+    /* Skrócenie szerokości */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+#paramForm input[type="number"]:focus {
+    border-color: #3498db;
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
+    outline: none;
+}
+
+#paramForm button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#paramForm button:hover {
+    background-color: #2980b9;
+}
+
+/* Wykres */
+#plotContainer {
+    flex: 2;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    min-height: 400px;
+}
+
+/* Informacje na wykresie */
+#infoDisplay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(52, 152, 219, 0.8);
+    color: #fff;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    z-index: 10;
+}
+
+/* Tabela wyników */
+#resultsTable {
+    width: 100%;
+    margin-top: 20px;
+}
+
+#resultsTable table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#resultsTable th,
+#resultsTable td {
+    border: 1px solid #dcdde1;
+    padding: 10px;
+    text-align: center;
+}
+
+#resultsTable th {
+    background-color: #3498db;
+    color: #fff;
+}
+
+#resultsTable tr:nth-child(even) {
+    background-color: #f5f8fc;
+}
+
+#resultsTable tr:hover {
+    background-color: #eaf3fc;
+}

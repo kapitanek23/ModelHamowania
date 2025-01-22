@@ -1,306 +1,75 @@
 <!DOCTYPE html>
 <html lang="pl">
+
 <head>
   <meta charset="UTF-8" />
   <title>Symulacja hamowania – z tabelą i wyborem trybu zakończenia</title>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <style>
-    /* Styl kontenera na wykres */
-    #plotContainer {
-      position: relative;
-      width: 800px;
-      height: 500px;
-    }
-    /* Panel z bieżącą prędkością i siłą */
-    #infoDisplay {
-      position: absolute;
-      right: 20px;
-      top: 20px;
-      background-color: rgba(255,255,255,0.8);
-      padding: 5px 10px;
-      border: 1px solid #999;
-      border-radius: 5px;
-      font-weight: bold;
-      z-index: 9999;
-    }
-    /* Tabela wyników */
-    #resultsTable table {
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    #resultsTable th, #resultsTable td {
-      border: 1px solid #ccc;
-      padding: 5px 10px;
-      text-align: center;
-    }
-    #resultsTable th {
-      background-color: #eee;
-    }
-    .navbar {
-    background-color: #eee;
-    padding: 10px;
-    margin-bottom: 20px;
-    }
-    .navbar a {
-    margin-right: 10px;
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
 
-<div class="navbar">
-        <a href="/">Strona główna</a>
-        <a href="/instrukcja">Instrukcja</a>
+<body>
+  <div class="navbar">
+    <a href="/">Strona główna</a>
+    <a href="/instrukcja">Instrukcja</a>
+  </div>
+
+  <h1>Symulacja spowolnienia pojazdu</h1>
+
+  <div id="mainContainer">
+    <!-- Kontener z panelem i wykresem -->
+    <div id="contentRow">
+      <!-- Panel wprowadzania informacji -->
+      <form id="paramForm">
+        <label for="v0">Początkowa prędkość v0:</label>
+        <input type="number" id="v0" value="30" step="0.1">
+
+        <label>Jednostka prędkości (wejściowa):</label>
+        <input type="radio" name="velocityUnitInput" value="ms" checked> m/s
+        <input type="radio" name="velocityUnitInput" value="kmh"> km/h
+
+        <label for="dt">Krok czasowy dt (s):</label>
+        <input type="number" id="dt" value="10" step="0.01">
+
+        <label for="c">Współczynnik oporu c:</label>
+        <input type="number" id="c" value="0.1" step="0.01">
+
+        <label for="mass">Masa pojazdu m (kg):</label>
+        <input type="number" id="mass" value="1000" step="10">
+
+        <label for="t_max">Maksymalny czas t_max (s):</label>
+        <input type="number" id="t_max" value="60" step="1">
+
+        <label>Tryb zakończenia symulacji:</label>
+        <input type="radio" name="stopMode" value="time" checked> Zatrzymaj po czasie <br>
+        <input type="radio" name="stopMode" value="velocity"> Zatrzymaj, gdy v=0
+
+        <label>Jednostka prędkości (wyjściowa):</label>
+        <input type="radio" name="velocityUnitOutput" value="ms" checked> m/s
+        <input type="radio" name="velocityUnitOutput" value="kmh"> km/h
+
+        <button type="button" id="simulateBtn">Symuluj</button>
+        <button type="button" id="clearBtn">Wyczyść</button>
+      </form>
+
+      <!-- Wykres -->
+      <div id="plotContainer">
+        <div id="myPlot" style="width: 100%; height: 100%; position: relative;">
+          <div id="infoDisplay">
+            Prędkość: --<br>
+            Siła: --
+          </div>
+        </div>
+      </div>
     </div>
 
-    <h1>Symulacja spowolnienia pojazdu</h1>
-
-<form id="paramForm">
-  <label>Początkowa prędkość v0:</label>
-  <input type="number" id="v0" value="30" step="0.1">
-  <br><br>
-
-  <label>Jednostka prędkości (wejściowa):</label>
-  <input type="radio" name="velocityUnitInput" value="ms" checked> m/s
-  <input type="radio" name="velocityUnitInput" value="kmh"> km/h
-  <br><br>
-
-  <label>Krok czasowy dt (s):</label>
-  <input type="number" id="dt" value="0.1" step="0.01">
-  <br><br>
-
-  <label>Współczynnik oporu c:</label>
-  <input type="number" id="c" value="0.1" step="0.01">
-  <br><br>
-
-  <label>Masa pojazdu m (kg):</label>
-  <input type="number" id="mass" value="1000" step="10">
-  <br><br>
-
-  <label>Maksymalny czas t_max (s):</label>
-  <input type="number" id="t_max" value="60" step="1">
-  <br><br>
-
-  <!-- Wybór trybu zakończenia symulacji -->
-  <label>Tryb zakończenia symulacji:</label>
-  <br>
-  <input type="radio" name="stopMode" value="time" checked> Zatrzymaj po czasie (t_max)
-  <br>
-  <input type="radio" name="stopMode" value="velocity"> Zatrzymaj, gdy v=0
-  <br><br>
-
-  <label>Jednostka prędkości (wyjściowa):</label>
-  <input type="radio" name="velocityUnitOutput" value="ms" checked> m/s
-  <input type="radio" name="velocityUnitOutput" value="kmh"> km/h
-  <br><br>
-
-  <button type="button" id="simulateBtn">Symuluj</button>
-  <button type="button" id="clearBtn">Wyczyść</button>
-</form>
-
-<hr>
-
-<div id="plotContainer">
-  <div id="myPlot" style="width: 100%; height: 100%;"></div>
-  <div id="infoDisplay">
-    Prędkość: --<br>
-    Siła: --
+    <!-- Tabela wyników -->
+    <div id="resultsTable">
+      <!-- Dynamicznie generowana tabela -->
+    </div>
   </div>
-</div>
 
-<!-- Kontener na tabelę z wynikami -->
-<div id="resultsTable"></div>
-
-<script>
-  let simulationTimer = null;
-
-  document.getElementById('simulateBtn').addEventListener('click', function() {
-    // Anuluj ewentualną poprzednią animację
-    if (simulationTimer) {
-      clearInterval(simulationTimer);
-      simulationTimer = null;
-    }
-
-    Plotly.purge('myPlot');
-    document.getElementById('infoDisplay').innerHTML = `Prędkość: --<br>Siła: --`;
-    document.getElementById('resultsTable').innerHTML = '';
-
-    // Pobieramy dane z formularza
-    const v0Input = parseFloat(document.getElementById('v0').value);
-    const dt = parseFloat(document.getElementById('dt').value);
-    const c = parseFloat(document.getElementById('c').value);
-    const m = parseFloat(document.getElementById('mass').value);
-    const t_max = parseFloat(document.getElementById('t_max').value);
-
-    // Jednostka wejściowa v0
-    const velocityUnitInput = document.querySelector('input[name="velocityUnitInput"]:checked').value;
-    let v0_ms = v0Input;
-    if (velocityUnitInput === 'kmh') {
-      v0_ms = v0_ms / 3.6;
-    }
-
-    // Jednostka wyjściowa
-    const velocityUnitOutput = document.querySelector('input[name="velocityUnitOutput"]:checked').value;
-
-    // Tryb zakończenia symulacji
-    const stopMode = document.querySelector('input[name="stopMode"]:checked').value; 
-    // => "time" lub "velocity"
-
-    // Budujemy url do /data
-    const url = `/data?v0=${v0_ms}&dt=${dt}&c=${c}&m=${m}&t_max=${t_max}&stop_mode=${stopMode}`;
-
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        const time = data.time;               // [s]
-        const velocitySI = data.velocity;     // [m/s]
-        let velocityOut = [...velocitySI];    // skopiuj
-
-        if (velocityUnitOutput === 'kmh') {
-          velocityOut = velocityOut.map(v => v * 3.6);
-        }
-
-        // Obliczamy siłę oporu w [N]
-        const dragForces = velocitySI.map(v => c * v * v);
-
-        // Przygotowanie do rysowania
-        const xData = [];
-        const yData = [];
-
-        const traceMain = {
-          x: xData,
-          y: yData,
-          mode: 'lines',
-          line: {
-            color: 'blue',
-            width: 3
-          },
-          name: 'Prędkość'
-        };
-
-        const layout = {
-          title: 'Prędkość pojazdu w czasie',
-          xaxis: { title: 'Czas [s]' },
-          yaxis: {
-            title: (velocityUnitOutput === 'kmh') ? 'Prędkość [km/h]' : 'Prędkość [m/s]'
-          }
-        };
-
-        Plotly.newPlot('myPlot', [traceMain], layout);
-
-        // Animacja
-        let currentIndex = 0;
-        const totalPoints = time.length;
-        const intervalMs = 50;
-
-        simulationTimer = setInterval(() => {
-          if (currentIndex >= totalPoints) {
-            clearInterval(simulationTimer);
-            simulationTimer = null;
-
-            // Gdy dotarliśmy do końca - generujemy tabelę
-            generateResultsTable();
-            return;
-          }
-
-          xData.push(time[currentIndex]);
-          yData.push(velocityOut[currentIndex]);
-
-          Plotly.update('myPlot', {
-            x: [xData],
-            y: [yData]
-          }, {}, [0]);
-
-          // Uaktualniamy panel prędkości i siły
-          const speedVal = velocityOut[currentIndex].toFixed(2);
-          const forceVal = dragForces[currentIndex].toFixed(2);
-          document.getElementById('infoDisplay').innerHTML =
-            `Prędkość: ${speedVal} ${(velocityUnitOutput === 'kmh') ? 'km/h' : 'm/s'}<br>` +
-            `Siła: ${forceVal} N`;
-
-          currentIndex++;
-        }, intervalMs);
-
-        // Funkcja: generuje tabelę wyników
-        function generateResultsTable() {
-          let html = `
-            <table>
-              <thead>
-                <tr>
-                  <th>Nr iteracji</th>
-                  <th>Czas [s]</th>
-                  <th>Prędkość [${(velocityUnitOutput==='kmh')?'km/h':'m/s'}]</th>
-                  <th>Δ Prędkość</th>
-                  <th>Siła [N]</th>
-                  <th>Δ Siła</th>
-                </tr>
-              </thead>
-              <tbody>
-          `;
-
-          for (let i = 0; i < time.length; i++) {
-            const tVal = time[i].toFixed(2);
-            const vVal = velocityOut[i].toFixed(2);
-
-            // Zmiana prędkości
-            let dv = 0;
-            if (i > 0) {
-              dv = velocityOut[i] - velocityOut[i-1];
-            }
-            const dvVal = dv.toFixed(2);
-
-            // Siła
-            const fVal = dragForces[i].toFixed(2);
-            let df = 0;
-            if (i > 0) {
-              df = dragForces[i] - dragForces[i-1];
-            }
-            const dfVal = df.toFixed(2);
-
-            html += `
-              <tr>
-                <td>${i}</td>
-                <td>${tVal}</td>
-                <td>${vVal}</td>
-                <td>${dvVal}</td>
-                <td>${fVal}</td>
-                <td>${dfVal}</td>
-              </tr>
-            `;
-          }
-
-          html += `</tbody></table>`;
-          document.getElementById('resultsTable').innerHTML = html;
-        }
-      })
-      .catch(error => console.error(error));
-  });
-
-  // Obsługa przycisku Wyczyść
-  document.getElementById('clearBtn').addEventListener('click', function() {
-    if (simulationTimer) {
-      clearInterval(simulationTimer);
-      simulationTimer = null;
-    }
-    Plotly.purge('myPlot');
-    document.getElementById('infoDisplay').innerHTML = 'Prędkość: --<br>Siła: --';
-    document.getElementById('resultsTable').innerHTML = '';
-
-    // Przywróć wartości początkowe
-    document.getElementById('v0').value = '30';
-    document.getElementById('dt').value = '0.1';
-    document.getElementById('c').value = '0.1';
-    document.getElementById('mass').value = '1000';
-    document.getElementById('t_max').value = '60';
-    
-    document.querySelector('input[name="velocityUnitInput"][value="ms"]').checked = true;
-    document.querySelector('input[name="velocityUnitOutput"][value="ms"]').checked = true;
-    document.querySelector('input[name="stopMode"][value="time"]').checked = true;
-  });
-</script>
-
+  <script src="/static/js.js"></script>
 </body>
+
 </html>
