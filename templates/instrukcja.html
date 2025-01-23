@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <title>Instrukcja</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style2.css') }}">
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js">
+    </script>
 </head>
 
 <body>
@@ -21,23 +24,26 @@
         W naszym projekcie modelujemy proces spowalniania (hamowania) pojazdu
         przy założeniu, że siła oporu jest proporcjonalna do kwadratu prędkości:
         <em>F<sub>drag</sub> = c &middot; v<sup>2</sup></em>.
-        Zakładamy, że opór jest jedyną siłą hamującą.
+        Zakładamy, że opór jest jedyną siłą hamującą. Równanie różniczkowe opisujące zmiany prędkości ma postać:
+        <em>\( \frac{dv}{dt} = -\frac{c}{m} v^2 \)</em>, a rozwiązanie numeryczne tego równania służy do symulacji ruchu pojazdu.
     </p>
 
     <h2>2. Wykorzystywane wzory</h2>
     <ul>
         <li>
-            Równanie ruchu zakłada przyspieszenie (ujemne)
-            <em>a = F<sub>drag</sub> / m</em>.
-            <br>
-            Więc <em>v<sub>n+1</sub> = v<sub>n</sub> - a &middot; &Delta;t</em>.
+            Równanie różniczkowe zmiany prędkości:
+            <em>\( \frac{dv}{dt} = -\frac{c}{m} v^2 \)</em>.
         </li>
         <li>
-            Położenie obliczamy z
-            <em>x<sub>n+1</sub> = x<sub>n</sub> + v<sub>n</sub> &middot; &Delta;t</em>.
+            Dyskretne przybliżenie do numerycznego rozwiązania:
+            <em>\( v_{n+1} = v_n - \frac{c}{m} v_n^2 \Delta t \)</em>.
         </li>
         <li>
-            Siła oporu: <em>F<sub>drag</sub> = c &middot; v<sup>2</sup></em>.
+            Obliczenie położenia:
+            <em>\( x_{n+1} = x_n + v_n \Delta t \)</em>.
+        </li>
+        <li>
+            Siła oporu: <em>\( F_{drag} = c \cdot v^2 \)</em>.
         </li>
     </ul>
 
@@ -59,7 +65,7 @@
     <h2>4. Instrukcja obsługi strony</h2>
     <ol>
         <li>
-            Przejdź na stronę główną (<a href="/">Kliknij tutaj</a> lub wpisz <code>/</code> w adresie).
+            Przejdź na stronę główną (<a href="/">Kliknij tutaj</a>).
         </li>
         <li>
             Wypełnij formularz parametrami:

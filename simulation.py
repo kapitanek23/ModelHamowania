@@ -1,8 +1,6 @@
-# simulation.py
-
 def simulate_braking(v0=30.0, dt=0.1, c=0.1, m=1000.0, t_max=60.0, stop_mode='time'):
     """
-    Symulacja spowolnienia pojazdu z oporem c * v^2.
+    Symulacja spowolnienia pojazdu z oporem c * v^2 na podstawie równania różniczkowego.
     Parametry:
       v0         - prędkość początkowa [m/s]
       dt         - krok czasowy [s]
@@ -30,12 +28,13 @@ def simulate_braking(v0=30.0, dt=0.1, c=0.1, m=1000.0, t_max=60.0, stop_mode='ti
             velocity_points.append(v)
             position_points.append(x)
 
-            # Opór
-            F_drag = c * v**2
-            a = F_drag / m
+            # Równanie różniczkowe: dv/dt = - (c / m) * v^2
+            dv = - (c / m) * v**2 * dt
+            v_new = v + dv
 
-            v_new = v - a * dt
-            x_new = x + v * dt
+            # Pozycja: dx = v * dt
+            dx = v * dt
+            x_new = x + dx
 
             v = max(v_new, 0)
             x = x_new
@@ -51,11 +50,13 @@ def simulate_braking(v0=30.0, dt=0.1, c=0.1, m=1000.0, t_max=60.0, stop_mode='ti
             velocity_points.append(v)
             position_points.append(x)
 
-            F_drag = c * v**2
-            a = F_drag / m
+            # Równanie różniczkowe: dv/dt = - (c / m) * v^2
+            dv = - (c / m) * v**2 * dt
+            v_new = v + dv
 
-            v_new = v - a * dt
-            x_new = x + v * dt
+            # Pozycja: dx = v * dt
+            dx = v * dt
+            x_new = x + dx
 
             v = max(v_new, 0)
             x = x_new
